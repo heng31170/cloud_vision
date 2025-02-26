@@ -14,6 +14,7 @@ import java.util.List;
 public interface UserService extends IService<User> {
     /**
      * 用户注册
+     *
      * @param userAccount   用户账户
      * @param userPassword  用户密码
      * @param checkPassword 校验密码
@@ -23,6 +24,7 @@ public interface UserService extends IService<User> {
 
     /**
      * 用户登录
+     *
      * @param userAccount  用户账户
      * @param userPassword 用户密码
      * @param request
@@ -32,6 +34,7 @@ public interface UserService extends IService<User> {
 
     /**
      * 用户退出登录
+     *
      * @param request
      * @return
      */
@@ -39,6 +42,7 @@ public interface UserService extends IService<User> {
 
     /**
      * 获取加密后的密码
+     *
      * @param userPassword
      * @return
      */
@@ -46,6 +50,7 @@ public interface UserService extends IService<User> {
 
     /**
      * 获得脱敏后的登录用户信息
+     *
      * @param user
      * @return
      */
@@ -53,6 +58,7 @@ public interface UserService extends IService<User> {
 
     /**
      * 获取当前登录用户
+     *
      * @param request
      * @return
      */
@@ -60,13 +66,15 @@ public interface UserService extends IService<User> {
 
     /**
      * 获得脱敏后的用户信息
+     *
      * @param user
      * @return
      */
     UserVO getUserVO(User user);
 
     /**
-     * 获得脱敏后的用户信息列表
+     * 获得脱敏后的用户信息（列表）
+     *
      * @param userList
      * @return
      */
@@ -74,10 +82,18 @@ public interface UserService extends IService<User> {
 
     /**
      * 获取查询条件
+     *
      * @param userQueryRequest
      * @return
      */
     QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest);
 
 
+    /**
+     * 管理员判断
+     *
+     * @param user
+     * @return
+     */
+    boolean isAdmin(User user);
 }

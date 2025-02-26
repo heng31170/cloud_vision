@@ -37,6 +37,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     /**
      * 用户注册
+     *
      * @param userAccount   用户账户
      * @param userPassword  用户密码
      * @param checkPassword 校验密码
@@ -81,6 +82,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     /**
      * 用户登录
+     *
      * @param userAccount  用户账户
      * @param userPassword 用户密码
      * @param request
@@ -118,6 +120,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     /**
      * 退出登录
+     *
      * @param request
      * @return
      */
@@ -126,13 +129,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 判断是否已经登录
         Object userObject = request.getSession().getAttribute(USER_LOGIN_STATE);
         if (userObject == null) {
-            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR,"未登录");
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "未登录");
         }
+        // 移除登录状态
+        request.getSession().removeAttribute(USER_LOGIN_STATE);
         return true;
     }
 
     /**
      * 获取加密后的密码
+     *
      * @param userPassword
      * @return
      */
@@ -184,27 +190,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     /**
      * 获取脱敏后的用户信息
+     *
      * @param user
      * @return
      */
     @Override
     public UserVO getUserVO(User user) {
-        if(user == null) {
+        if (user == null) {
             return null;
         }
         UserVO userVO = new UserVO();
-        BeanUtil.copyProperties(user,userVO);
+        BeanUtil.copyProperties(user, userVO);
         return userVO;
     }
 
     /**
      * 获取脱敏后的用户信息列表
+     *
      * @param userList
      * @return
      */
     @Override
     public List<UserVO> getUserVOList(List<User> userList) {
-        if(CollUtil.isEmpty(userList)) {
+        if (CollUtil.isEmpty(userList)) {
             return new ArrayList<>();
         }
         return userList.stream().map(this::getUserVO).collect(Collectors.toList());
@@ -212,6 +220,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     /**
      * 获取查询条件
+     *
      * @param userQueryRequest
      * @return
      */
@@ -235,6 +244,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         queryWrapper.like(StrUtil.isNotBlank(userProfile), "userProfile", userProfile);
         queryWrapper.orderBy(StrUtil.isNotEmpty(sortField), sortOrder.equals("ascend"), sortField);
         return queryWrapper;
+    }
+
+    /**
+     * 管理员判断
+     */
+    @Override
+    public boolean isAdmin(User user) {
+        return user != null && UserRoleEnum.ADMIN.getValue().equals(user.getUserRole());
     }
 
 
