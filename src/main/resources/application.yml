@@ -2,6 +2,10 @@ server:
   port: 8123
   servlet:
     context-path: /api
+    # cookie 过期时间 30天
+    session:
+      cookie:
+        max-age: 2592000
 spring:
   application:
     name: cloud-vision-backend
@@ -15,6 +19,18 @@ spring:
   servlet:
     multipart:
       max-file-size: 10MB
+  # Redis配置
+  redis:
+    database: 0
+    host: 192.168.50.135
+    port: 6379
+    password: 123456
+    connect-timeout: 5000
+  # Session 配置
+  session:
+    store-type: redis
+    # 过期时间 30天
+    timeout: 2592000
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: false

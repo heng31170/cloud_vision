@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zaizi.exception.BusinessException;
 import com.zaizi.exception.ErrorCode;
 import com.zaizi.exception.ThrowUtils;
-import com.zaizi.manager.FileManager;
+import com.zaizi.manager.CosManager;
 import com.zaizi.manager.upload.FilePictureUpload;
 import com.zaizi.manager.upload.PictureUploadTemplate;
 import com.zaizi.manager.upload.UrlPictureUpload;
@@ -32,6 +32,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.BeanUtils;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -48,7 +49,7 @@ import java.util.stream.Collectors;
 public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> implements PictureService{
 
     @Resource
-    private FileManager fileManager;
+    private CosManager cosManager;
     @Resource
     private UserService userService;
     @Resource
@@ -91,6 +92,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
         // 构建图片信息
         Picture picture = new Picture();
         picture.setUrl(uploadPictureResult.getUrl());
+        picture.setThumbnailUrl(uploadPictureResult.getThumbnailUrl());  // 略缩图
         // 使图片名称不完全依赖解析结果
         String picName = uploadPictureResult.getPicName();
         if(pictureUploadRequest != null && StrUtil.isNotBlank(pictureUploadRequest.getPicName())) {
@@ -286,7 +288,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
      * 批量抓取、创建图片
      */
     @Override
-    public int uploadPictureByBatch(PictureUploadByBatchRequest pictureUploadByBatchRequest, User loginUser) {
+    public Integer uploadPictureByBatch(PictureUploadByBatchRequest pictureUploadByBatchRequest, User loginUser) {
         String searchText = pictureUploadByBatchRequest.getSearchText();
         String namePrefix = pictureUploadByBatchRequest.getNamePrefix();
         if(StrUtil.isBlank(namePrefix)) {
@@ -340,6 +342,29 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
             }
         }
         return uploadCount;
+    }
+
+    /**
+     * 清理图片
+     */
+    @Async
+    @Override
+    public void clearPictureFile(Picture oldPicture) {
+        // 判断使用记录
+        String pictureUrl = oldPicture.getUrl();
+        long count = this.lambdaQuery()
+                .eq(Picture::getUrl, pictureUrl)
+                .count();
+        // 有记录，不清理
+        if(count > 1) {
+            return;
+        }
+        // 清理
+        cosManager.deleteObject(oldPicture.getUrl());
+        String thumbnailUrl = oldPicture.getThumbnailUrl();
+        if(StrUtil.isNotBlank(thumbnailUrl)) {
+            cosManager.deleteObject(thumbnailUrl);
+        }
     }
 
 

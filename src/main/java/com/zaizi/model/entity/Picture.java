@@ -1,10 +1,10 @@
 package com.zaizi.model.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
-import lombok.Data;
 
 /**
  * 图片
@@ -114,6 +114,11 @@ public class Picture implements Serializable {
      * 审核时间
      */
     private Date reviewTime;
+
+    /**
+     * 缩略图 url
+     */
+    private String thumbnailUrl;
 
 
     @TableField(exist = false)

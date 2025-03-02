@@ -58,6 +58,12 @@ public interface PictureService extends IService<Picture> {
     /**
      * 批量抓取、创建图片
      */
-    int uploadPictureByBatch(PictureUploadByBatchRequest pictureUploadByBatchRequest, User loginUser);
+    Integer uploadPictureByBatch(PictureUploadByBatchRequest pictureUploadByBatchRequest, User loginUser);
+
+    /**
+     * 清理图片
+     */
+    void clearPictureFile(Picture oldPicture);
+
 
 }
