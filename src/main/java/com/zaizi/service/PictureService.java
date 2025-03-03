@@ -3,10 +3,7 @@ package com.zaizi.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.zaizi.model.dto.picture.PictureQueryRequest;
-import com.zaizi.model.dto.picture.PictureReviewRequest;
-import com.zaizi.model.dto.picture.PictureUploadByBatchRequest;
-import com.zaizi.model.dto.picture.PictureUploadRequest;
+import com.zaizi.model.dto.picture.*;
 import com.zaizi.model.entity.Picture;
 import com.zaizi.model.entity.User;
 import com.zaizi.model.vo.PictureVO;
@@ -64,6 +61,22 @@ public interface PictureService extends IService<Picture> {
      * 清理图片
      */
     void clearPictureFile(Picture oldPicture);
+
+    /**
+     * 删除图片
+     */
+    void deletePicture(long pictureId, User loginUser);
+
+    /**
+     * 鉴权
+     */
+    void checkPictureAuth(User loginUser, Picture picture);
+
+    /**
+     * 编辑私有空间图片
+     */
+    void editPicture(PictureEditRequest pictureEditRequest, User loginUser);
+
 
 
 }
