@@ -19,9 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 @Service
@@ -34,6 +32,16 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space> implements
     @Resource
     private RedissonClient redissonClient;
 
+
+    /**
+     * 空间鉴权
+     */
+    @Override
+    public void checkSpaceAuth(User loginUser, Space space) {
+        if(!space.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "无空间权限");
+        }
+    }
 
     /**
      * 校验空间 校验空间名和空间等级

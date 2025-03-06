@@ -13,6 +13,11 @@ import com.zaizi.model.entity.User;
 public interface SpaceService extends IService<Space> {
 
     /**
+     * 空间鉴权
+     */
+    void checkSpaceAuth(User loginUser, Space space);
+
+    /**
      * 校验空间 空间名和等级
      */
     void validSpace(Space space, boolean add);

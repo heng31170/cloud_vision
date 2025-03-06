@@ -9,6 +9,7 @@ import com.zaizi.model.entity.User;
 import com.zaizi.model.vo.PictureVO;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
 * @author 8618655416913
@@ -77,6 +78,20 @@ public interface PictureService extends IService<Picture> {
      */
     void editPicture(PictureEditRequest pictureEditRequest, User loginUser);
 
+    /**
+     * 颜色搜索图片
+     */
+    List<PictureVO> searchPictureByColor(Long spaceId, String picColor, User loginUser);
+
+    /**
+     * 批量编辑图片
+     */
+    void editPictureByBatch(PictureEditByBatchRequest pictureEditByBatchRequest, User loginUser);
+
+    /**
+     * 大量编辑图片
+     */
+    void batchEditPictureMetadata(PictureEditByBatchRequest pictureEditByBatchRequest, Long spaceId, Long loginUserId);
 
 
 }
