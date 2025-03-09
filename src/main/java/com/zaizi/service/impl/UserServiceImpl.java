@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zaizi.constant.UserConstant;
 import com.zaizi.exception.BusinessException;
 import com.zaizi.exception.ErrorCode;
+import com.zaizi.manager.auth.StpKit;
 import com.zaizi.model.dto.user.UserQueryRequest;
 import com.zaizi.model.entity.User;
 import com.zaizi.model.enums.UserRoleEnum;
@@ -115,6 +116,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         // 3. 记录用户的登录态
         request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
+        // sa-token
+        StpKit.SPACE.login(user.getId());
+        StpKit.SPACE.getSession().set(USER_LOGIN_STATE, user);
         return this.getLoginUserVO(user);
     }
 
@@ -179,12 +183,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (currentUser == null || currentUser.getId() == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
-        // 从数据库查询
-        /*long userId = currentUser.getId();
-        currentUser = this.getById(userId);
-        if(currentUser == null) {
-            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
-        }*/
         return currentUser;
     }
 

@@ -21,14 +21,6 @@ public enum SpaceLevelEnum {
 
     private final long maxSize;
 
-    private static final Map<Integer, SpaceLevelEnum> valueToEnumMap = new HashMap<>();
-
-    static {
-        for(SpaceLevelEnum spaceLevelEnum: SpaceLevelEnum.values()) {
-            valueToEnumMap.put(spaceLevelEnum.getValue(), spaceLevelEnum);
-        }
-    }
-
     /**
      *
      * @param text text文本
@@ -42,6 +34,15 @@ public enum SpaceLevelEnum {
         this.maxCount = maxCount;
         this.maxSize = maxSize;
     }
+
+    private static final Map<Integer, SpaceLevelEnum> valueToEnumMap = new HashMap<>();
+
+    static {
+        for(SpaceLevelEnum spaceLevelEnum: SpaceLevelEnum.values()) {
+            valueToEnumMap.put(spaceLevelEnum.getValue(), spaceLevelEnum);
+        }
+    }
+
 
     // 根据value 获取枚举
     public static SpaceLevelEnum getEnumByValue(Integer value) {

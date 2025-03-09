@@ -1,6 +1,7 @@
 package com.zaizi.controller;
 
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zaizi.annotation.AuthCheck;
 import com.zaizi.common.BaseResponse;
 import com.zaizi.common.DeleteRequest;
@@ -9,13 +10,12 @@ import com.zaizi.constant.UserConstant;
 import com.zaizi.exception.BusinessException;
 import com.zaizi.exception.ErrorCode;
 import com.zaizi.exception.ThrowUtils;
-import com.zaizi.model.dto.space.SpaceAddRequest;
-import com.zaizi.model.dto.space.SpaceEditRequest;
-import com.zaizi.model.dto.space.SpaceLevel;
-import com.zaizi.model.dto.space.SpaceUpdateRequest;
+import com.zaizi.manager.auth.SpaceUserAuthManager;
+import com.zaizi.model.dto.space.*;
 import com.zaizi.model.entity.Space;
 import com.zaizi.model.entity.User;
 import com.zaizi.model.enums.SpaceLevelEnum;
+import com.zaizi.model.vo.SpaceVO;
 import com.zaizi.service.SpaceService;
 import com.zaizi.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +38,60 @@ public class SpaceController {
     private SpaceService spaceService;
     @Resource
     private UserService userService;
+    @Resource
+    private SpaceUserAuthManager spaceUserAuthManager;
+
+    /**
+     * 获取空间封装列表
+     */
+    @PostMapping("/list/page/vo")
+    public BaseResponse<Page<SpaceVO>> listSpaceVOByPage(@RequestBody SpaceQueryRequest spaceQueryRequest) {
+        long current = spaceQueryRequest.getCurrent();
+        long size = spaceQueryRequest.getPageSize();
+        Page<Space> spacePage = spaceService.page(new Page<>(current, size),
+                spaceService.getQueryWrapper(spaceQueryRequest));
+        Page<SpaceVO> spaceVOPage = spaceService.getSpaceVOPage(spacePage);
+        return ResultUtils.success(spaceVOPage);
+    }
+
+    /**
+     * 获取空间列表 管理员可用
+     */
+    @PostMapping("/list/page")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Page<Space>> listSpaceByPage(@RequestBody SpaceQueryRequest spaceQueryRequest) {
+        long current = spaceQueryRequest.getCurrent();
+        long size = spaceQueryRequest.getPageSize();
+        Page<Space> spacePage = spaceService.page(new Page<>(current, size),
+                spaceService.getQueryWrapper(spaceQueryRequest));
+        return ResultUtils.success(spacePage);
+    }
+
+    /**
+     * 根据id获取空间（包装
+     */
+    @GetMapping("/get/vo")
+    public BaseResponse<SpaceVO> getSpaceVOById(long id,HttpServletRequest request) {
+        ThrowUtils.throwIf(id < 0, ErrorCode.PARAMS_ERROR);
+        Space space = spaceService.getById(id);
+        ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR);
+        SpaceVO spaceVO = spaceService.getSpaceVO(space);
+        // 获取权限列表
+        User loginUser = userService.getLoginUser(request);
+        List<String> permissionList = spaceUserAuthManager.getPermissionList(space,loginUser);
+        spaceVO.setPermissionList(permissionList);
+        return ResultUtils.success(spaceVO);
+    }
+    /**
+     * 根据id获取空间
+     */
+    @GetMapping("/get")
+    public BaseResponse<Space> getSpaceById(long id) {
+        ThrowUtils.throwIf(id < 0, ErrorCode.PARAMS_ERROR);
+        Space space = spaceService.getById(id);
+        ThrowUtils.throwIf(space == null ,ErrorCode.NOT_FOUND_ERROR);
+        return ResultUtils.success(space);
+    }
 
     /**
      * 创建空间
